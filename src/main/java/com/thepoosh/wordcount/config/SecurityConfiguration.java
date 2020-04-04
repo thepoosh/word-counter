@@ -66,7 +66,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         web.ignoring()
             .antMatchers(HttpMethod.OPTIONS, "/**")
             .antMatchers("/swagger-ui/index.html")
-            .antMatchers("/documents/**")
+            .antMatchers("/document/**")
             .antMatchers("/test/**");
     }
 

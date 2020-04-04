@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -93,7 +94,7 @@ public class StringReaderService {
     private void storeWordCount(String payload) {
         Map<String, Long> wordCount = new HashMap<>();
         Arrays.stream(payload.split("\\s+"))
-            .map(word -> word.toLowerCase().replaceAll("[^a-zA-Z0-9]", ""))
+            .map(this::sanitizeWord)
             .forEach(word -> wordCount.put(word, wordCount.getOrDefault(word, 0L) + 1));
 
         final Iterable<Word> stored = wordRepository.findAllById(wordCount.keySet());
@@ -104,5 +105,24 @@ public class StringReaderService {
 
         wordRepository.saveAll(Iterables.concat(stored, newWordes));
 
+    }
+
+    /**
+     * get an individual word stats
+     * @param word the word to get
+     * @return the word if it exists and {@link Optional#empty()} otherwise
+     */
+    public Optional<Word> getWord(String word) {
+        return wordRepository.findById(sanitizeWord(word));
+    }
+
+    /**
+     * cleans a word and returns it in all lowercase
+     *
+     * @param word input to sanitize
+     * @return the same word lower cased and only alphanumeric values
+     */
+    public String sanitizeWord(String word) {
+        return word.toLowerCase().replaceAll("[^\\p{L}\\p{Nd}]", "");
     }
 }
